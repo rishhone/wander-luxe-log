@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Hero } from "@/components/Hero";
 import { PlacesList } from "@/components/PlacesList";
 import { AddPlaceDialog } from "@/components/AddPlaceDialog";
-import { MapView } from "@/components/MapView";
+import { LeafletMap } from "@/components/LeafletMap";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Map } from "lucide-react";
@@ -97,7 +97,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-              <MapView places={places} />
+              <LeafletMap places={places} />
             </div>
           </TabsContent>
         </Tabs>
