@@ -79,53 +79,55 @@ export const MapView = ({ places }: MapViewProps) => {
         className="w-full h-full"
         scrollWheelZoom={true}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
-        {placesWithCoords.map((place) => (
-          <Marker
-            key={place.id}
-            position={place.coordinates as L.LatLngExpression}
-            icon={place.isVisited ? visitedIcon : bucketListIcon}
-          >
-            <Popup>
-              <div className="p-2 min-w-[200px]">
-                <div className="mb-2">
-                  <Badge 
-                    className={place.isVisited 
-                      ? "bg-primary text-primary-foreground" 
-                      : "bg-secondary text-secondary-foreground"
-                    }
-                  >
-                    {place.isVisited ? "Visited" : "Bucket List"}
-                  </Badge>
-                </div>
-                
-                <h3 className="font-bold text-lg mb-2">{place.name}</h3>
-                
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                  <MapPin className="w-3 h-3" />
-                  <span>{place.location}</span>
-                </div>
-                
-                {place.date && place.isVisited && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
-                    <span>{place.date}</span>
+        <>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          
+          {placesWithCoords.map((place) => (
+            <Marker
+              key={place.id}
+              position={place.coordinates as L.LatLngExpression}
+              icon={place.isVisited ? visitedIcon : bucketListIcon}
+            >
+              <Popup>
+                <div className="p-2 min-w-[200px]">
+                  <div className="mb-2">
+                    <Badge 
+                      className={place.isVisited 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-secondary text-secondary-foreground"
+                      }
+                    >
+                      {place.isVisited ? "Visited" : "Bucket List"}
+                    </Badge>
                   </div>
-                )}
-                
-                <img 
-                  src={place.imageUrl} 
-                  alt={place.name}
-                  className="w-full h-32 object-cover rounded-lg mt-3"
-                />
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+                  
+                  <h3 className="font-bold text-lg mb-2">{place.name}</h3>
+                  
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
+                    <MapPin className="w-3 h-3" />
+                    <span>{place.location}</span>
+                  </div>
+                  
+                  {place.date && place.isVisited && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Calendar className="w-3 h-3" />
+                      <span>{place.date}</span>
+                    </div>
+                  )}
+                  
+                  <img 
+                    src={place.imageUrl} 
+                    alt={place.name}
+                    className="w-full h-32 object-cover rounded-lg mt-3"
+                  />
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </>
       </MapContainer>
     </div>
   );
