@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Hero } from "@/components/Hero";
 import { PlacesList } from "@/components/PlacesList";
 import { AddPlaceDialog } from "@/components/AddPlaceDialog";
+import { MapView } from "@/components/MapView";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
+import { Plus, Map } from "lucide-react";
 import parisImage from "@/assets/sample-paris.jpg";
 import japanImage from "@/assets/sample-japan.jpg";
 import greeceImage from "@/assets/sample-greece.jpg";
@@ -51,12 +52,16 @@ const Index = () => {
 
         <Tabs defaultValue="visited" className="w-full">
           <div className="flex items-center justify-between mb-6">
-            <TabsList className="grid w-[400px] grid-cols-2">
+            <TabsList className="grid w-[600px] grid-cols-3">
               <TabsTrigger value="visited" className="text-base">
                 Places Visited ({visitedPlaces.length})
               </TabsTrigger>
               <TabsTrigger value="bucket" className="text-base">
                 Bucket List ({bucketListPlaces.length})
+              </TabsTrigger>
+              <TabsTrigger value="map" className="text-base">
+                <Map className="mr-2 h-4 w-4" />
+                Map View
               </TabsTrigger>
             </TabsList>
             
@@ -75,6 +80,25 @@ const Index = () => {
 
           <TabsContent value="bucket" className="mt-8">
             <PlacesList places={bucketListPlaces} title="My Bucket List" />
+          </TabsContent>
+
+          <TabsContent value="map" className="mt-8">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold text-foreground">World Map</h2>
+                <div className="flex gap-4 items-center text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-primary"></div>
+                    <span>Visited</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-secondary"></div>
+                    <span>Bucket List</span>
+                  </div>
+                </div>
+              </div>
+              <MapView places={places} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
