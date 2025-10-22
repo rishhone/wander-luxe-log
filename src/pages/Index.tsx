@@ -1,53 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Hero } from "@/components/Hero";
 import { PlacesList } from "@/components/PlacesList";
 import { AddPlaceDialog } from "@/components/AddPlaceDialog";
 import { LeafletMap } from "@/components/LeafletMap";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Map } from "lucide-react";
-import parisImage from "@/assets/sample-paris.jpg";
-import japanImage from "@/assets/sample-japan.jpg";
-import greeceImage from "@/assets/sample-greece.jpg";
+import { Plus, Map, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [places, setPlaces] = useState([
-    {
-      id: "1",
-      name: "Eiffel Tower",
-      location: "Paris, France",
-      date: "2024-03-15",
-      imageUrl: parisImage,
-      isVisited: true,
-    },
-    {
-      id: "2",
-      name: "Mount Fuji",
-      location: "Honshu, Japan",
-      date: "2024-05-20",
-      imageUrl: japanImage,
-      isVisited: true,
-    },
-    {
-      id: "3",
-      name: "Santorini",
-      location: "Cyclades, Greece",
-      imageUrl: greeceImage,
-      isVisited: false,
-    },
-  ]);
+  const [places, setPlaces] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+    fetchPlaces();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/auth");
+    }
+  };
+
+  const fetchPlaces = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('places')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedPlaces = data?.map((place) => ({
+        id: place.id,
+        name: place.name,
+        location: place.location,
+        date: place.date_visited,
+        imageUrl: place.media_urls?.[0] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
+        isVisited: place.is_visited,
+        latitude: place.latitude,
+        longitude: place.longitude,
+      })) || [];
+
+      setPlaces(formattedPlaces);
+    } catch (error: any) {
+      toast.error("Failed to load places");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   const visitedPlaces = places.filter(p => p.isVisited);
   const bucketListPlaces = places.filter(p => !p.isVisited);
 
-  const handleAddPlace = (newPlace: any) => {
-    setPlaces([...places, newPlace]);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       <div className="container mx-auto px-4 py-8 space-y-12">
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
         <Hero onAddPlace={() => setIsDialogOpen(true)} />
 
         <Tabs defaultValue="visited" className="w-full">
@@ -106,7 +139,7 @@ const Index = () => {
       <AddPlaceDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        onAdd={handleAddPlace}
+        onAdd={fetchPlaces}
       />
     </div>
   );
